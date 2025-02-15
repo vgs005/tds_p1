@@ -1,26 +1,8 @@
-# app.py
-# /// script
-# dependencies = [
-#   "requests",
-#   "fastapi",
-#   "uvicorn",
-#   "python-dateutil",
-#   "pandas",
-#   "db-sqlite3",
-#   "scipy",
-#   "pybase64",
-#   "python-dotenv",
-#   "httpx",
-#   "markdown",
-#   "duckdb"
-# ]
-# ///
-
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import PlainTextResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from app.tasksA import *
-from app.tasksB import *
+from tasksA import *  # Import directly from tasksA
+from tasksB import *  # Import directly from tasksB
 import requests
 from dotenv import load_dotenv
 import os
@@ -38,52 +20,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-app = FastAPI()
 load_dotenv()
 
-# @app.get('/ask')
-# def ask(prompt: str):
-#     """ Prompt Gemini to generate a response based on the given prompt. """
-#     gemini_api_key = os.getenv('gemini_api_key')
-#     if not gemini_api_key:
-#         return JSONResponse(content={"error": "GEMINI_API_KEY not set"}, status_code=500)
-
-#     # Read the contents of tasks.py
-#     with open('tasks.py', 'r') as file:
-#         tasks_content = file.read()
-
-#     # Prepare the request data
-#     data = {
-#         "contents": [{
-#             "parts": [
-#                 {"text": f"Find the task function from here for the below prompt:\n{tasks_content}\n\nPrompt: {prompt}\n\n respond with the function_name and function_parameters with parameters in json format"},
-#             ]
-#         }]
-#     }
-
-#     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_api_key}"
-#     headers = {
-#         "Content-Type": "application/json"
-#     }
-
-#     response = requests.post(url, json=data, headers=headers)
-
-#     if response.status_code == 200:
-#         text_reponse = response.json()["candidates"][0]["content"]["parts"][0]["text"]
-#         match = re.search(r'json\n(.*?)\n', text_reponse, re.DOTALL)
-#         text_reponse = match.group(1).strip() if match else text_reponse
-#         return json.loads(text_reponse)
-#         # return JSONResponse(content=response.json(), status_code=200)
-#     else:
-#         return JSONResponse(content={"error": "Failed to get response", "details": response.text}, status_code=response.status_code)
-
-@app.get("/ask")
-def ask(prompt: str):
-    result = get_completions(prompt)
-    return result
-
-openai_api_chat  = "http://aiproxy.sanand.workers.dev/openai/v1/chat/completions" # for testing
+openai_api_chat = "http://aiproxy.sanand.workers.dev/openai/v1/chat/completions"  # for testing
 openai_api_key = os.getenv("AIPROXY_TOKEN")
 
 headers = {
@@ -414,75 +353,67 @@ def get_completions(prompt: str):
         response = client.post(
             f"{openai_api_chat}",
             headers=headers,
-            json=
-                {
-                    "model": "gpt-4o-mini",
-                    "messages": [
-                                    {"role": "system", "content": "You are a function classifier that extracts structured parameters from queries."},
-                                    {"role": "user", "content": prompt}
-                                ],
-                    "tools": [
-                                {
-                                    "type": "function",
-                                    "function": function
-                                } for function in function_definitions_llm
-                            ],
-                    "tool_choice": "auto"
-                },
+            json={
+                "model": "gpt-4o-mini",
+                "messages": [
+                    {"role": "system", "content": "You are a function classifier that extracts structured parameters from queries."},
+                    {"role": "user", "content": prompt}
+                ],
+                "tools": [
+                    {
+                        "type": "function",
+                        "function": function
+                    } for function in function_definitions_llm
+                ],
+                "tool_choice": "auto"
+            },
         )
-    # return response.json()
     print(response.json()["choices"][0]["message"]["tool_calls"][0]["function"])
     return response.json()["choices"][0]["message"]["tool_calls"][0]["function"]
-
 
 # Placeholder for task execution
 @app.post("/run")
 async def run_task(task: str):
     try:
-        # Placeholder logic for executing tasks
-        # Replace with actual logic to parse task and execute steps
-        # Example: Execute task and return success or error based on result
-        # llm_response = function_calling(tast), function_name = A1
         response = get_completions(task)
         print(response)
         task_code = response['name']
         arguments = response['arguments']
 
-        if "A1"== task_code:
+        if task_code == "A1":
             A1(**json.loads(arguments))
-        if "A2"== task_code:
+        elif task_code == "A2":
             A2(**json.loads(arguments))
-        if "A3"== task_code:
+        elif task_code == "A3":
             A3(**json.loads(arguments))
-        if "A4"== task_code:
+        elif task_code == "A4":
             A4(**json.loads(arguments))
-        if "A5"== task_code:
+        elif task_code == "A5":
             A5(**json.loads(arguments))
-        if "A6"== task_code:
+        elif task_code == "A6":
             A6(**json.loads(arguments))
-        if "A7"== task_code:
+        elif task_code == "A7":
             A7(**json.loads(arguments))
-        if "A8"== task_code:
+        elif task_code == "A8":
             A8(**json.loads(arguments))
-        if "A9"== task_code:
+        elif task_code == "A9":
             A9(**json.loads(arguments))
-        if "A10"== task_code:
+        elif task_code == "A10":
             A10(**json.loads(arguments))
-
-
-        if "B12"== task_code:
+        elif task_code == "B12":
             B12(**json.loads(arguments))
-        if "B3" == task_code:
+        elif task_code == "B3":
             B3(**json.loads(arguments))
-        if "B5" == task_code:
+        elif task_code == "B5":
             B5(**json.loads(arguments))
-        if "B6" == task_code:
+        elif task_code == "B6":
             B6(**json.loads(arguments))
-        if "B7" == task_code:
+        elif task_code == "B7":
             B7(**json.loads(arguments))
-        if "B9" == task_code:
+        elif task_code == "B9":
             B9(**json.loads(arguments))
-        return {"message": f"{task_code} Task '{task}' executed successfully"}
+
+        return {"message": f"Task '{task}' executed successfully"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -497,6 +428,7 @@ async def read_file(path: str = Query(..., description="File path to read")):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-if _name_ == "_main_":
+# Run the FastAPI app
+if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0",port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
