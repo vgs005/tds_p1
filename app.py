@@ -19,8 +19,8 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import PlainTextResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from app.tasksA import *
-from app.tasksB import *
+from tasksA import *
+from tasksB import *
 import requests
 from dotenv import load_dotenv
 import os
@@ -39,7 +39,7 @@ app.add_middleware(
 )
 
 
-app = FastAPI()
+
 load_dotenv()
 
 # @app.get('/ask')
@@ -497,6 +497,6 @@ async def read_file(path: str = Query(..., description="File path to read")):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0",port=8000)
