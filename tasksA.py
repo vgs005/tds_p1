@@ -42,7 +42,7 @@ def A3(filename='/data/dates.txt', targetfile='/data/dates-wednesdays.txt', week
     weekday_count = 0
 
     with open(input_file, 'r') as file:
-        weekday_count = sum(1 for date in file if parse(date).weekday() == int(weekday)-1)
+        weekday_count = sum(1 for date in file if parse(date).weekday() == int(weekday))
 
 
     with open(output_file, 'w') as file:
