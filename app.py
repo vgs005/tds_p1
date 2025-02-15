@@ -19,8 +19,8 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import PlainTextResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from tasksA import *
-from tasksB import *
+from app.tasksA import *
+from app.tasksB import *
 import requests
 from dotenv import load_dotenv
 import os
@@ -71,7 +71,7 @@ load_dotenv()
 
 #     if response.status_code == 200:
 #         text_reponse = response.json()["candidates"][0]["content"]["parts"][0]["text"]
-#         match = re.search(r'```json\n(.*?)\n```', text_reponse, re.DOTALL)
+#         match = re.search(r'json\n(.*?)\n', text_reponse, re.DOTALL)
 #         text_reponse = match.group(1).strip() if match else text_reponse
 #         return json.loads(text_reponse)
 #         # return JSONResponse(content=response.json(), status_code=200)
@@ -99,7 +99,7 @@ function_definitions_llm = [
             "type": "object",
             "properties": {
                 # "filename": {"type": "string", "pattern": r"https?://.*\.py"},
-                # "targetfile": {"type": "string", "pattern": r".*/(.*\.py)"},
+                # "targetfile": {"type": "string", "pattern": r"./(.\.py)"},
                 "email": {"type": "string", "pattern": r"[\w\.-]+@[\w\.-]+\.\w+"}
             },
             "required": ["filename", "targetfile", "email"]
@@ -112,7 +112,7 @@ function_definitions_llm = [
             "type": "object",
             "properties": {
                 "prettier_version": {"type": "string", "pattern": r"prettier@\d+\.\d+\.\d+"},
-                "filename": {"type": "string", "pattern": r".*/(.*\.md)"}
+                "filename": {"type": "string", "pattern": r"./(.\.md)"}
             },
             "required": ["prettier_version", "filename"]
         }
@@ -123,8 +123,8 @@ function_definitions_llm = [
         "parameters": {
             "type": "object",
             "properties": {
-                "filename": {"type": "string", "pattern": r"/data/.*dates.*\.txt"},
-                "targetfile": {"type": "string", "pattern": r"/data/.*/(.*\.txt)"},
+                "filename": {"type": "string", "pattern": r"/data/.dates.\.txt"},
+                "targetfile": {"type": "string", "pattern": r"/data/./(.\.txt)"},
                 "weekday": {"type": "integer", "pattern": r"(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)"}
             },
             "required": ["filename", "targetfile", "weekday"]
@@ -138,11 +138,11 @@ function_definitions_llm = [
             "properties": {
                 "filename": {
                     "type": "string",
-                    "pattern": r".*/(.*\.json)",
+                    "pattern": r"./(.\.json)",
                 },
                 "targetfile": {
                     "type": "string",
-                    "pattern": r".*/(.*\.json)",
+                    "pattern": r"./(.\.json)",
                 }
             },
             "required": ["filename", "targetfile"]
@@ -161,7 +161,7 @@ function_definitions_llm = [
                 },
                 "output_file_path": {
                     "type": "string",
-                    "pattern": r".*/(.*\.txt)",
+                    "pattern": r"./(.\.txt)",
                     "default": "/data/logs-recent.txt"
                 },
                 "num_files": {
@@ -186,7 +186,7 @@ function_definitions_llm = [
                 },
                 "output_file_path": {
                     "type": "string",
-                    "pattern": r".*/(.*\.json)",
+                    "pattern": r"./(.\.json)",
                     "default": "/data/docs/index.json"
                 }
             },
@@ -201,12 +201,12 @@ function_definitions_llm = [
             "properties": {
                 "filename": {
                     "type": "string",
-                    "pattern": r".*/(.*\.txt)",
+                    "pattern": r"./(.\.txt)",
                     "default": "/data/email.txt"
                 },
                 "output_file": {
                     "type": "string",
-                    "pattern": r".*/(.*\.txt)",
+                    "pattern": r"./(.\.txt)",
                     "default": "/data/email-sender.txt"
                 }
             },
@@ -221,12 +221,12 @@ function_definitions_llm = [
             "properties": {
                 "filename": {
                     "type": "string",
-                    "pattern": r".*/(.*\.txt)",
+                    "pattern": r"./(.\.txt)",
                     "default": "/data/credit-card.txt"
                 },
                 "image_path": {
                     "type": "string",
-                    "pattern": r".*/(.*\.png)",
+                    "pattern": r"./(.\.png)",
                     "default": "/data/credit-card.png"
                 }
             },
@@ -241,12 +241,12 @@ function_definitions_llm = [
             "properties": {
                 "filename": {
                     "type": "string",
-                    "pattern": r".*/(.*\.txt)",
+                    "pattern": r"./(.\.txt)",
                     "default": "/data/comments.txt"
                 },
                 "output_filename": {
                     "type": "string",
-                    "pattern": r".*/(.*\.txt)",
+                    "pattern": r"./(.\.txt)",
                     "default": "/data/comments-similar.txt"
                 }
             },
@@ -261,12 +261,12 @@ function_definitions_llm = [
             "properties": {
                 "filename": {
                     "type": "string",
-                    "pattern": r".*/(.*\.db)",
+                    "pattern": r"./(.\.db)",
                     "default": "/data/ticket-sales.db"
                 },
                 "output_filename": {
                     "type": "string",
-                    "pattern": r".*/(.*\.txt)",
+                    "pattern": r"./(.\.txt)",
                     "default": "/data/ticket-sales-gold.txt"
                 },
                 "query": {
@@ -305,7 +305,7 @@ function_definitions_llm = [
                 },
                 "save_path": {
                     "type": "string",
-                    "pattern": r".*/.*",
+                    "pattern": r"./.",
                     "description": "Path to save the downloaded content."
                 }
             },
@@ -320,7 +320,7 @@ function_definitions_llm = [
             "properties": {
                 "db_path": {
                     "type": "string",
-                    "pattern": r".*/(.*\.db)",
+                    "pattern": r"./(.\.db)",
                     "description": "Path to the SQLite database file."
                 },
                 "query": {
@@ -329,7 +329,7 @@ function_definitions_llm = [
                 },
                 "output_filename": {
                     "type": "string",
-                    "pattern": r".*/(.*\.txt)",
+                    "pattern": r"./(.\.txt)",
                     "description": "Path to the file where the query result will be saved."
                 }
             },
@@ -349,7 +349,7 @@ function_definitions_llm = [
                 },
                 "output_filename": {
                     "type": "string",
-                    "pattern": r".*/.*",
+                    "pattern": r"./.",
                     "description": "Path to the file where the content will be saved."
                 }
             },
@@ -364,12 +364,12 @@ function_definitions_llm = [
             "properties": {
                 "image_path": {
                     "type": "string",
-                    "pattern": r".*/(.*\.(jpg|jpeg|png|gif|bmp))",
+                    "pattern": r"./(.\.(jpg|jpeg|png|gif|bmp))",
                     "description": "Path to the input image file."
                 },
                 "output_path": {
                     "type": "string",
-                    "pattern": r".*/.*",
+                    "pattern": r"./.",
                     "description": "Path to save the processed image."
                 },
                 "resize": {
@@ -394,12 +394,12 @@ function_definitions_llm = [
             "properties": {
                 "md_path": {
                     "type": "string",
-                    "pattern": r".*/(.*\.md)",
+                    "pattern": r"./(.\.md)",
                     "description": "Path to the Markdown file to be converted."
                 },
                 "output_path": {
                     "type": "string",
-                    "pattern": r".*/.*",
+                    "pattern": r"./.",
                     "description": "Path where the converted file will be saved."
                 }
             },
@@ -497,6 +497,6 @@ async def read_file(path: str = Query(..., description="File path to read")):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-if __name__ == "__main__":
+if _name_ == "_main_":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
