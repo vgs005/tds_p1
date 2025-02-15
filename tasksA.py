@@ -38,15 +38,35 @@ def A2(prettier_version="prettier@3.4.2", filename="/data/format.md"):
 def A3(filename='/data/dates.txt', targetfile='/data/dates-wednesdays.txt', weekday=2):
     input_file = filename
     output_file = targetfile
-    weekday = weekday
     weekday_count = 0
 
-    with open(input_file, 'r') as file:
-        weekday_count = sum(1 for date in file if parse(date).weekday() == int(weekday))
+    # Check if the input file exists
+    if not os.path.exists(input_file):
+        print(f"Error: Input file {input_file} does not exist.")
+        return
 
+    try:
+        # Read the dates and count Wednesdays
+        with open(input_file, 'r') as file:
+            dates = file.readlines()
+            print(f"Found {len(dates)} dates in {input_file}")
+            weekday_count = sum(1 for date in dates if parse(date.strip()).weekday() == weekday)
 
-    with open(output_file, 'w') as file:
-        file.write(str(weekday_count))
+        # Log the result
+        print(f"Found {weekday_count} Wednesdays in the file.")
+
+        # Check if the /data/ directory is writable
+        if not os.access(os.path.dirname(output_file), os.W_OK):
+            print(f"Error: No write permission to the directory {os.path.dirname(output_file)}.")
+            return
+
+        # Write the count to the output file
+        with open(output_file, 'w') as file:
+            file.write(str(weekday_count))
+            print(f"Count of Wednesdays written to {output_file}")
+
+    except Exception as e:
+        print(f"Error processing the file: {e}")
 
 def A4(filename="/data/contacts.json", targetfile="/data/contacts-sorted.json"):
     # Load the contacts from the JSON file
